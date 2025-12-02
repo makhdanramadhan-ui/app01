@@ -45,7 +45,7 @@ class WishNoteController extends Controller
             'deskripsi_singkat' => $request['deskripsi_singkat'],
             'tipe_wadah' => ($request['tipe_wadah']),
             'privasi' => ($request['privasi']),
-            'users_id' => $userId,
+            'users_id' => auth()->id(),
         ]);
         
         // Redirect to dashboard or intended page
@@ -79,8 +79,13 @@ class WishNoteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(WishNote $wishNote)
+   public function destroy($id)
     {
-        //
+    $wishnote = WishNote::findOrFail($id);
+    $wishnote->delete();
+
+    return redirect()->back()->with('success', 'Wishnote berhasil dihapus');
     }
+
+
 }

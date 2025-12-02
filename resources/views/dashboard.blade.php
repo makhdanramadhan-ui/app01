@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,6 +11,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Fade In + Slide Up */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Delay biar muncul satu-satu */
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
         body { font-family: 'Nunito', sans-serif; background-color: #f8f9fa; }
         .navbar { background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .navbar-brand { font-weight: 700; color: #a18cd1 !important; font-size: 1.5rem; }
@@ -78,7 +102,7 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <span class="me-2 fw-bold text-dark">Guest User</span>
+                            <span class="me-2 fw-bold text-dark">{{ auth()->user()->name ?? 'Guest' }}</span>
                             <img src="https://ui-avatars.com/api/?name=Guest+User&background=random" class="nav-profile-img">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
@@ -107,7 +131,7 @@
         <!-- Hero Section dengan padding responsif (p-4 di mobile, p-md-5 di desktop) -->
         <div class="hero-section d-flex justify-content-between align-items-center p-4 p-md-5" id="hero-section">
             <div id="hero-text-container" class="fade-in">
-                <h2 class="fw-bold mb-2" id="hero-title">Selamat Datang!</h2>
+                <h2 class="fw-bold mb-2" id="hero-title">Selamat Datang, {{ auth()->user()->name ?? 'Guest' }}</h2>
                 <p class="mb-3 opacity-75" id="hero-desc">Buat wadah harapanmu atau sampaikan doa untuk temanmu.</p>
                 <button class="btn btn-create shadow-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                     <i class="fas fa-plus me-2"></i>Buat Wishnote Baru
@@ -122,92 +146,62 @@
             <li class="nav-item ms-2"><a class="nav-link rounded-pill px-4" data-filter="mine">Milik Saya</a></li>
             <li class="nav-item ms-2"><a class="nav-link rounded-pill px-4" data-filter="friends">Teman</a></li>
         </ul>
+    
+    <!-- card dinamis -->
+    <div class="row g-4">
+    @foreach ($wishnotes as $note) 
+    <div class="col-12 col-sm-6 col-lg-4 filter-item" 
+     data-category="{{ ($note->users_id == auth()->id()) ? 'mine' : 'friends' }}">
 
-        <div class="row g-4" id="cards-container">
-            
-            <!-- UPDATE: Grid Responsif (col-12 mobile, col-sm-6 tablet, col-lg-4 desktop) -->
-            
-            <!-- Card 1 -->
-            <div class="col-12 col-sm-6 col-lg-4 filter-item" data-category="friends">
-                <div class="wish-card shadow-sm" onclick="openDetail('Harapan Natal 2025', 'Kevin', 'tree')">
-                    <div class="skin-badge skin-tree"><i class="fa-solid fa-tree"></i></div>
-                    <div class="card-body mt-4">
-                        <h5 class="card-title">Harapan Natal 2025</h5>
-                        <p class="card-text text-truncate">Kumpulkan ucapan natal kalian di pohon ini ya!</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="status-pill status-public">Public</span>
-                            <small class="text-muted"><i class="fas fa-envelope me-1"></i> 12 Pesan</small>
-                        </div>
-                        <hr class="my-3 text-muted opacity-25">
-                        <div class="d-flex align-items-center">
-                            <img src="https://ui-avatars.com/api/?name=Kevin&background=ef5350&color=fff" class="rounded-circle me-2" width="25">
-                            <small class="text-muted">by Kevin</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="col-12 col-sm-6 col-lg-4 filter-item" data-category="friends">
-                <div class="wish-card shadow-sm" onclick="openDetail('Untuk Kelulusan Sarah', 'Sarah', 'mading')">
-                    <div class="skin-badge skin-mading"><i class="fa-solid fa-note-sticky"></i></div>
-                    <div class="card-body mt-4">
-                        <h5 class="card-title">Untuk Kelulusan Sarah</h5>
-                        <p class="card-text text-truncate">Tulis kenangan manis kalian di mading virtual ini.</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="status-pill status-public">Public</span>
-                            <small class="text-muted"><i class="fas fa-envelope me-1"></i> 45 Pesan</small>
-                        </div>
-                        <hr class="my-3 text-muted opacity-25">
-                        <div class="d-flex align-items-center">
-                            <img src="https://ui-avatars.com/api/?name=Sarah&background=ab47bc&color=fff" class="rounded-circle me-2" width="25">
-                            <small class="text-muted">by Sarah</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="col-12 col-sm-6 col-lg-4 filter-item" data-category="mine">
-                <div class="wish-card shadow-sm" onclick="openDetail('Rahasia Hati', 'You', 'mailbox')">
-                    <div class="skin-badge skin-mailbox"><i class="fa-solid fa-envelope-open-text"></i></div>
-                    <div class="card-body mt-4">
-                        <h5 class="card-title">Rahasia Hati</h5>
-                        <p class="card-text text-truncate">Hanya aku yang bisa baca, silakan curhat.</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="status-pill status-private">Private</span>
-                            <small class="text-muted"><i class="fas fa-envelope me-1"></i> 5 Pesan</small>
-                        </div>
-                        <hr class="my-3 text-muted opacity-25">
-                        <div class="d-flex align-items-center">
-                            <img src="https://ui-avatars.com/api/?name=Guest+User&background=random" class="rounded-circle me-2" width="25">
-                            <small class="text-muted">by You</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="col-12 col-sm-6 col-lg-4 filter-item" data-category="mine">
-                <div class="wish-card shadow-sm" onclick="openDetail('Resolusi 2025', 'You', 'mading')">
-                    <div class="skin-badge skin-mading"><i class="fa-solid fa-note-sticky"></i></div>
-                    <div class="card-body mt-4">
-                        <h5 class="card-title">Resolusi 2025</h5>
-                        <p class="card-text text-truncate">Target dan mimpi yang harus dicapai tahun depan!</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="status-pill status-public">Public</span>
-                            <small class="text-muted"><i class="fas fa-envelope me-1"></i> 0 Pesan</small>
-                        </div>
-                        <hr class="my-3 text-muted opacity-25">
-                        <div class="d-flex align-items-center">
-                            <img src="https://ui-avatars.com/api/?name=Guest+User&background=random" class="rounded-circle me-2" width="25">
-                            <small class="text-muted">by You</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    <div class="wish-card shadow-sm" onclick="openDetail('{{ addslashes($note->judul) }}', '{{ addslashes($note->user->name ?? 'User') }}', '{{ $note->tipe_wadah }}')">
+        <!-- Skin Badge -->
+        <div class="skin-badge 
+            {{ $note->tipe_wadah == 'tree' ? 'skin-tree' : ($note->tipe_wadah == 'mading' ? 'skin-mading' : 'skin-mailbox') }}">
+            <i class="fa-solid
+                {{ $note->tipe_wadah == 'tree' ? 'fa-tree' : ($note->tipe_wadah == 'mading' ? 'fa-note-sticky' : 'fa-envelope-open-text') }}">
+            </i>
         </div>
+
+        <div class="card-body mt-4">
+
+            <!-- Tombol Hapus (AMAN dari klik card) -->
+            @if ($note->users_id == auth()->id())
+                <form action="{{ route('wishnotes.destroy', $note->id) }}" 
+                      method="POST" 
+                      onsubmit="event.stopPropagation(); return confirm('Hapus wishnote ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                        class="btn btn-danger btn-sm mb-2"
+                        onclick="event.stopPropagation();">
+                        Hapus
+                    </button>
+                </form>
+            @endif
+
+            <h5 class="card-title">{{ $note->judul }}</h5>
+            <p class="card-text text-truncate">{{ $note->deskripsi_singkat }}</p>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="status-pill {{ $note->privasi == 'public' ? 'status-public' : 'status-private' }}">
+                    {{ ucfirst($note->privasi) }}
+                </span>
+                <small class="text-muted">
+                    <i class="fas fa-envelope me-1"></i> {{ $note->messages_count ?? 0 }} Pesan
+                </small>
+            </div>
+
+            <hr class="my-3 text-muted opacity-25">
+
+            <div class="d-flex align-items-center">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode($note->user->name ?? 'User') }}&background=random" 
+                     class="rounded-circle me-2" width="25">
+                <small class="text-muted">by {{ $note->user->name ?? 'Unknown' }}</small>
+            </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
     </div>
 
     <!-- modal wishnote baru  -->
@@ -258,163 +252,40 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // --- 1. Fungsi Navigasi ke Halaman Detail ---
-        function openDetail(title, author, type) {
-            // Kita kirim data lewat URL parameter
-            // encodeURIComponent() digunakan agar spasi atau karakter khusus aman di URL
-            window.location.href = `pohon?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&type=${type}`;
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- 2. Logika Tab Filter & Hero Section ---
-            const heroContent = {
-                all: { title: "Selamat Datang!", desc: "Buat wadah harapanmu atau sampaikan doa untuk temanmu.", icon: "🎄 📝" },
-                mine: { title: "Koleksi Saya", desc: "Semua catatan dan wadah harapan yang telah Anda buat.", icon: "📂" },
-                friends: { title: "Punya Teman", desc: "Lihat apa yang teman-temanmu harapkan saat ini.", icon: "👯‍♂️" }
-            };
-
-            const tabs = document.querySelectorAll('.nav-link[data-filter]');
-            const cards = document.querySelectorAll('.filter-item');
-            const heroTitle = document.getElementById('hero-title');
-            const heroDesc = document.getElementById('hero-desc');
-            const heroIcon = document.getElementById('hero-icon');
-            const heroTextContainer = document.getElementById('hero-text-container');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // Update Tab Active
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const filterValue = this.getAttribute('data-filter');
-
-                    // Filter Kartu
-                    cards.forEach(card => {
-                        const cardCategory = card.getAttribute('data-category');
-                        if (filterValue === 'all' || cardCategory === filterValue) {
-                            card.classList.remove('d-none');
-                        } else {
-                            card.classList.add('d-none');
-                        }
-                    });
-
-                    // Update Hero Section
-                    heroTextContainer.classList.remove('fade-in');
-                    heroIcon.classList.remove('fade-in');
-                    void heroTextContainer.offsetWidth; // Trigger reflow untuk restart animasi
-                    
-                    heroTitle.innerText = heroContent[filterValue].title;
-                    heroDesc.innerText = heroContent[filterValue].desc;
-                    heroIcon.innerText = heroContent[filterValue].icon;
-                    
-                    heroTextContainer.classList.add('fade-in');
-                    heroIcon.classList.add('fade-in');
-
-                    // --- 1. Fungsi Navigasi (Bawaan) ---
+        // Navigasi ke halaman detail
     function openDetail(title, author, type) {
-        window.location.href = `detail?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&type=${type}`;
+        window.location.href = `pohon?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&type=${type}`;
     }
 
-    // --- 2. Fungsi LOAD: Menampilkan Data dari Memory Browser ---
-    // Fungsi ini akan otomatis jalan saat halaman dibuka
     document.addEventListener('DOMContentLoaded', function() {
-        // Kita cek, apakah kita sedang di halaman "Milik Saya" atau "Semua"?
-        // Karena kita hanya ingin menampilkan kartu buatan sendiri di sana.
-        const path = window.location.pathname;
-        const isMinePage = path.includes("mine.html");
-        const isIndexPage = path.includes("index.html");
+    const heroContent = {
+        all: { title: "Selamat Datang, {{ auth()->user()->name ?? 'Guest' }}", desc: "Buat wadah harapanmu atau sampaikan doa untuk temanmu.", icon: "🎄 📝" },
+        mine: { title: "Koleksi Saya", desc: "Semua catatan yang telah Anda buat.", icon: "📂" },
+        friends: { title: "Punya Teman", desc: "Lihat apa yang teman-temanmu harapkan.", icon: "👯‍♂️" }
+    };
 
-        if (isMinePage || isIndexPage) {
-            loadWishnotes(); 
-        }
-    });
+    const tabs = document.querySelectorAll('.nav-link[data-filter]');
+    const cards = document.querySelectorAll('.filter-item');
 
-    function loadWishnotes() {
-        // Ambil data dari LocalStorage
-        const storedNotes = JSON.parse(localStorage.getItem('myWishnotes')) || [];
-        const container = document.getElementById('cards-container') || document.querySelector('.row.g-4');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
 
-        // Loop setiap data dan buatkan HTML-nya
-        storedNotes.forEach(note => {
-            // Tentukan style berdasarkan tipe
-            let skinClass = '', iconClass = '';
-            if(note.type === 'tree') { skinClass = 'skin-tree'; iconClass = 'fa-tree'; }
-            else if (note.type === 'mading') { skinClass = 'skin-mading'; iconClass = 'fa-note-sticky'; }
-            else { skinClass = 'skin-mailbox'; iconClass = 'fa-envelope-open-text'; }
+            const filterValue = this.getAttribute('data-filter');
 
-            let statusClass = (note.status === 'public') ? 'status-public' : 'status-private';
-            let statusText = (note.status === 'public') ? 'Public' : 'Private';
+            cards.forEach(card => {
+                card.classList.toggle('d-none', filterValue !== 'all' && card.dataset.category !== filterValue);
+            });
 
-            // const html = `
-            //     <div class="col-12 col-sm-6 col-lg-4 fade-in">
-            //         <div class="wish-card shadow-sm" onclick="openDetail('${note.title}', 'You', '${note.type}')">
-            //             <div class="skin-badge ${skinClass}"><i class="fa-solid ${iconClass}"></i></div>
-            //             <div class="card-body mt-4">
-            //                 <h5 class="card-title">${note.title}</h5>
-            //                 <p class="card-text text-truncate">${note.desc}</p>
-            //                 <div class="d-flex justify-content-between align-items-center mt-3">
-            //                     <span class="status-pill ${statusClass}">${statusText}</span>
-            //                     <small class="text-muted"><i class="fas fa-envelope me-1"></i> 0 Pesan</small>
-            //                 </div>
-            //                 <hr class="my-3 text-muted opacity-25">
-            //                 <div class="d-flex align-items-center">
-            //                     <img src="https://ui-avatars.com/api/?name=Guest+User&background=random" class="rounded-circle me-2" width="25">
-            //                     <small class="text-muted">by You</small>
-            //                 </div>
-            //             </div>
-            //         </div>
-            //     </div>
-            // `;
-            
-            // Masukkan kartu baru di urutan paling depan (setelah kartu statis jika ada)
-            // Atau gunakan 'afterbegin' agar muncul paling atas
-            // container.insertAdjacentHTML('afterbegin', html);
-        });
-    }
-
-    // --- 3. Fungsi SAVE: Menyimpan ke Memory & Pindah Halaman ---
-    // function saveWishnote() {
-    //     // A. Ambil Value Input
-    //     const title = document.getElementById('inputTitle').value;
-    //     const desc = document.getElementById('inputDesc').value;
-    //     const type = document.getElementById('inputType').value;
-    //     const status = document.getElementById('inputStatus').value;
-
-    //     if(title === "" || desc === "") {
-    //         alert("Judul dan Deskripsi wajib diisi!");
-    //         return;
-    //     }
-
-    //     // B. Bungkus data jadi Object
-    //     const newNote = {
-    //         id: Date.now(), // ID unik pakai waktu sekarang
-    //         title: title,
-    //         desc: desc,
-    //         type: type,
-    //         status: status,
-    //         author: 'You'
-    //     };
-
-    //     // C. Ambil data lama, gabung dengan data baru, simpan lagi
-    //     let notes = JSON.parse(localStorage.getItem('myWishnotes')) || [];
-    //     notes.push(newNote); // Tambah data baru
-    //     localStorage.setItem('myWishnotes', JSON.stringify(notes)); // Simpan ke browser
-
-    //     // D. Tutup Modal
-    //     const modalElement = document.getElementById('createModal');
-    //     const modalInstance = bootstrap.Modal.getInstance(modalElement);
-    //     modalInstance.hide();
-    //     document.getElementById('addWishForm').reset();
-
-    //     // E. LOGIKA UTAMA: REDIRECT (PINDAH) KE MILIK SAYA
-    //     // Walaupun kamu buat di 'Teman', layar akan otomatis pindah ke 'mine.html'
-    //     // untuk melihat hasilnya.
-    //     window.location.href = 'mine.html';
-    // }
-                });
+            const hero = heroContent[filterValue];
+            document.getElementById('hero-title').innerText = hero.title;
+            document.getElementById('hero-desc').innerText = hero.desc;
+            document.getElementById('hero-icon').innerText = hero.icon;
             });
         });
+    });
+
     </script>
 </body>
 </html>
